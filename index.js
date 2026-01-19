@@ -1,0 +1,31 @@
+import express from "express";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+import cors from "cors";
+
+import { application } from "./config/application.js";
+
+const app = express();
+const PORT = application.PORT;
+
+// Middleware
+app.use(
+  cors({
+    origin: application.CLIENT_URL,
+    credentials: true,
+  }),
+);
+
+// Health check
+app.get("/api/health", (_req, res) => res.json({ ok: true }));
+
+try {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+  console.log("Connected to MongoDB");
+} catch (error) {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+}
