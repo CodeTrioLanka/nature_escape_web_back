@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import cors from "cors";
-
+import homeRoute from "./route/home.route.js";
 import { application } from "./config/application.js";
 
 const app = express();
@@ -15,6 +15,12 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use(express.json());
+
+//endpoints
+
+app.use("/api/home", homeRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
