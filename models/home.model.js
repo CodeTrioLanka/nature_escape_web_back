@@ -7,7 +7,7 @@ const homeSchema = new mongoose.Schema({
   expert_Team_members:Number,
   total_tours:Number,
   happy_travelers:Number,
-  gallery: String,
+  gallery: [String],
   homebg:String,
   destinationImage:String,
   personalizedImage:String

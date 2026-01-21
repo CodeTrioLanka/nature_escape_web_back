@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/", homeGet);
 router.post("/", upload.fields([
-  { name: "gallery", maxCount: 1 },
+  { name: "gallery", maxCount: 10 },
   { name: "homebg", maxCount: 1 },
   { name: "destinationImage", maxCount: 1 },
   { name: "personalizedImage", maxCount: 1 },
