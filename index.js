@@ -4,7 +4,7 @@ import connectDB from "./config/db.js";
 import cors from "cors";
 import homeRoute from "./route/home.route.js";
 import { application } from "./config/application.js";
-
+import authRoute from './route/auth.route.js';
 const app = express();
 const PORT = application.PORT;
 
@@ -17,10 +17,12 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 
 //endpoints
 
 app.use("/api/home", homeRoute);
+app.use('/api/auth', authRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
