@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import homeRoute from "./route/home.route.js";
+import uploadRoute from "./route/upload.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
 const app = express();
@@ -22,6 +23,7 @@ app.use(cookieParser());
 //endpoints
 
 app.use("/api/home", homeRoute);
+app.use("/api/upload", uploadRoute);
 app.use('/api/auth', authRoute);
 
 // Health check
