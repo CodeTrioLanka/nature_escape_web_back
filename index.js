@@ -17,8 +17,25 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to DB
-await connectDB();
+// Connect to DB on first request
+let isConnected = false;
+const ensureDBConnection = async () => {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
+  }
+};
+
+// Middleware to ensure DB connection
+app.use(async (req, res, next) => {
+  try {
+    await ensureDBConnection();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
 
 // Routes
 app.use("/api/home", homeRoute);
