@@ -127,16 +127,14 @@ export const homeEdit = async (req, res) => {
 
     const homeData = { ...req.body };
 
-    // Handle multiple gallery images
+    // Handle file uploads if any (for backward compatibility)
     if (req.files && req.files.gallery) {
-      // Delete old gallery images
       if (existingHome.gallery && existingHome.gallery.length > 0) {
         for (const imageUrl of existingHome.gallery) {
           await deleteFromCloudinary(imageUrl);
         }
       }
       
-      // Upload new gallery images
       const galleryUrls = [];
       for (const file of req.files.gallery) {
         const cloudinaryUrl = await uploadToCloudinary(file.path);
@@ -146,7 +144,6 @@ export const homeEdit = async (req, res) => {
       homeData.gallery = galleryUrls;
     }
 
-    // Handle single images
     const singleImageFields = ['homebg', 'destinationImage', 'personalizedImage'];
     for (const field of singleImageFields) {
       if (req.files && req.files[field]) {
@@ -159,6 +156,25 @@ export const homeEdit = async (req, res) => {
         homeData[field] = cloudinaryUrl;
         fs.unlinkSync(file.path);
       }
+      // Handle direct URL updates (when images are pre-uploaded)
+      else if (homeData[field] && homeData[field] !== existingHome[field]) {
+        // Delete old image if URL changed
+        if (existingHome[field]) {
+          await deleteFromCloudinary(existingHome[field]);
+        }
+      }
+    }
+
+    // Handle gallery updates for direct URL updates
+    if (homeData.gallery && JSON.stringify(homeData.gallery) !== JSON.stringify(existingHome.gallery)) {
+      // Delete old gallery images that are not in the new gallery
+      if (existingHome.gallery && existingHome.gallery.length > 0) {
+        for (const oldImageUrl of existingHome.gallery) {
+          if (!homeData.gallery.includes(oldImageUrl)) {
+            await deleteFromCloudinary(oldImageUrl);
+          }
+        }
+      }
     }
 
     const home = await Home.findByIdAndUpdate(req.params.id, homeData, {
@@ -167,6 +183,7 @@ export const homeEdit = async (req, res) => {
     
     res.json({ home, message: "Home updated successfully" });
   } catch (error) {
+    console.error('Update error:', error);
     res.status(400).json({ error: error.message });
   }
 };
