@@ -5,6 +5,7 @@ import cors from "cors";
 import homeRoute from "./route/home.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
+import aboutUsRoute from './route/aboutUs.route.js';
 
 const app = express();
 
@@ -40,6 +41,9 @@ app.use(async (req, res, next) => {
 // Routes
 app.use("/api/home", homeRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/aboutUs', aboutUsRoute);
+
+// Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 // Export for Vercel
