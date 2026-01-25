@@ -8,30 +8,32 @@ const router = Router();
 // Single image upload endpoint
 router.post("/", upload.single("image"), async (req, res) => {
   try {
+    console.log('Upload request received');
+    console.log('File:', req.file);
+    
     if (!req.file) {
+      console.log('No file in request');
       return res.status(400).json({ error: "No image file provided" });
     }
 
-    const cloudinaryUrl = await uploadToCloudinary(req.file.path);
+    // For memory storage, we need to save the buffer to a temporary file
+    const tempPath = `uploads/${Date.now()}-${req.file.originalname}`;
+    fs.writeFileSync(tempPath, req.file.buffer);
     
-    // Clean up local file
-    fs.unlinkSync(req.file.path);
+    console.log('Uploading to Cloudinary:', tempPath);
+    const cloudinaryUrl = await uploadToCloudinary(tempPath);
+    console.log('Cloudinary URL:', cloudinaryUrl);
+    
+    // Clean up temporary file
+    fs.unlinkSync(tempPath);
     
     res.json({ 
       url: cloudinaryUrl,
       message: "Image uploaded successfully" 
     });
   } catch (error) {
-    // Clean up local file if upload fails
-    if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.error("Error cleaning up file:", cleanupError);
-      }
-    }
-    
     console.error("Upload error:", error);
+    
     res.status(500).json({ 
       error: "Failed to upload image",
       details: error.message 

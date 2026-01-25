@@ -3,48 +3,39 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import homeRoute from "./route/home.route.js";
+import uploadRoute from "./route/upload.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
-import aboutUsRoute from './route/aboutUs.route.js';
-
 const app = express();
+const PORT = application.PORT;
 
 // Middleware
-app.use(cors({
-  origin: application.CLIENT_URL,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: application.CLIENT_URL,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to DB on first request
-let isConnected = false;
-const ensureDBConnection = async () => {
-  if (!isConnected) {
-    await connectDB();
-    isConnected = true;
-  }
-};
+//endpoints
 
-// Middleware to ensure DB connection
-app.use(async (req, res, next) => {
-  try {
-    await ensureDBConnection();
-    next();
-  } catch (error) {
-    console.error('Database connection failed:', error);
-    res.status(500).json({ error: 'Database connection failed' });
-  }
-});
-
-// Routes
 app.use("/api/home", homeRoute);
+app.use("/api/upload", uploadRoute);
 app.use('/api/auth', authRoute);
-app.use('/api/aboutUs', aboutUsRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-// Export for Vercel
-export default app;
+try {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+  console.log("Connected to MongoDB");
+} catch (error) {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+}

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const application = {
   // Server
   PORT: process.env.PORT || 5000,
