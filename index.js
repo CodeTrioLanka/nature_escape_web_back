@@ -28,6 +28,7 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/aboutus", aboutUsRoute);
 app.use('/api/auth', authRoute);
 
+
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
