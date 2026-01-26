@@ -7,9 +7,27 @@ cloudinary.config({
   api_secret: application.CLOUDINARY_API_SECRET,
 });
 
-export const uploadToCloudinary = async (filePath) => {
+export const uploadToCloudinary = async (file) => {
   try {
-    const result = await cloudinary.uploader.upload(filePath);
+    let result;
+    
+    // Handle buffer (memory storage)
+    if (Buffer.isBuffer(file)) {
+      result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { resource_type: 'auto' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(file);
+      });
+    } 
+    // Handle file path (disk storage)
+    else {
+      result = await cloudinary.uploader.upload(file);
+    }
+    
     return result.secure_url;
   } catch (error) {
     throw error;
