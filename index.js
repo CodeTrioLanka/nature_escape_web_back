@@ -8,6 +8,7 @@ import aboutUsRoute from "./route/aboutUs.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
 import serviceRoute from './route/service.route.js';
+
 const app = express();
 const PORT = application.PORT;
 
