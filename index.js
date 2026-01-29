@@ -6,6 +6,7 @@ import homeRoute from "./route/home.route.js";
 import uploadRoute from "./route/upload.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
+import serviceRoute from './route/service.route.js';
 const app = express();
 const PORT = application.PORT;
 
@@ -25,7 +26,7 @@ app.use(cookieParser());
 app.use("/api/home", homeRoute);
 app.use("/api/upload", uploadRoute);
 app.use('/api/auth', authRoute);
-
+app.use('/api/service', serviceRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));

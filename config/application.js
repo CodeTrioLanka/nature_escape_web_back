@@ -4,7 +4,7 @@ dotenv.config();
 export const application = {
   // Server
   PORT: process.env.PORT || 5000,
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5174",
 
   // Database
   MONGO_URL: process.env.MONGO_URL,
