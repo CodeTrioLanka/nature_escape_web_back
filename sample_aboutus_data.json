@@ -1,0 +1,104 @@
+{
+    "hero": {
+        "heroBackground": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&h=1080&fit=crop",
+        "heroTitle": "We Create Memories",
+        "heroDescription": "Your trusted partner in discovering Sri Lanka's natural wonders since 2010"
+    },
+    "stats": {
+        "yearExperience": 15,
+        "happyTravelers": 10000,
+        "toursCompleted": 500,
+        "destination": 50
+    },
+    "milestones": [
+        {
+            "year": 2010,
+            "event": "Founded Nature Escape",
+            "mstone_description": "Started with a dream to share Sri Lanka's natural beauty with the world"
+        },
+        {
+            "year": 2014,
+            "event": "First 1000 Customers",
+            "mstone_description": "Reached our first major milestone of trust and quality service"
+        },
+        {
+            "year": 2018,
+            "event": "Eco-Tourism Award",
+            "mstone_description": "Recognized nationally for sustainable tourism practices"
+        },
+        {
+            "year": 2022,
+            "event": "Digital Transformation",
+            "mstone_description": "Launched modern online booking platform for seamless experience"
+        },
+        {
+            "year": 2024,
+            "event": "10,000+ Happy Travelers",
+            "mstone_description": "Continuing to grow and create unforgettable memories"
+        }
+    ],
+    "values": [
+        {
+            "icon": "Heart",
+            "title": "Passion for Travel",
+            "description": "We believe travel transforms lives. Every journey we craft is designed to create meaningful experiences.",
+            "color": "from-rose-500 to-pink-600"
+        },
+        {
+            "icon": "Leaf",
+            "title": "Sustainability First",
+            "description": "We're committed to eco-friendly tourism that protects Sri Lanka's natural beauty for future generations.",
+            "color": "from-emerald-500 to-green-600"
+        },
+        {
+            "icon": "Users",
+            "title": "Local Expertise",
+            "description": "Our team of local guides brings authentic insights and hidden gems you won't find in guidebooks.",
+            "color": "from-blue-500 to-cyan-600"
+        },
+        {
+            "icon": "Shield",
+            "title": "Safety & Trust",
+            "description": "Your safety is our priority. We ensure every aspect of your journey is secure and worry-free.",
+            "color": "from-violet-500 to-purple-600"
+        },
+        {
+            "icon": "Award",
+            "title": "Excellence",
+            "description": "Award-winning service that consistently exceeds expectations and creates unforgettable memories.",
+            "color": "from-amber-500 to-orange-600"
+        },
+        {
+            "icon": "Globe",
+            "title": "Cultural Connection",
+            "description": "We bridge cultures, helping travelers connect deeply with Sri Lanka's rich heritage and warm people.",
+            "color": "from-teal-500 to-emerald-600"
+        }
+    ],
+    "team": [
+        {
+            "name": "Rajitha Fernando",
+            "role": "Founder & CEO",
+            "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
+            "bio": "20+ years in tourism industry"
+        },
+        {
+            "name": "Priya Mendis",
+            "role": "Head of Operations",
+            "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop",
+            "bio": "Expert in logistics and planning"
+        },
+        {
+            "name": "Ashan Perera",
+            "role": "Lead Tour Guide",
+            "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop",
+            "bio": "Certified wildlife expert"
+        },
+        {
+            "name": "Nimali Silva",
+            "role": "Customer Experience Manager",
+            "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
+            "bio": "Multilingual support specialist"
+        }
+    ]
+}
