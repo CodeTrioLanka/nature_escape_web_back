@@ -7,6 +7,9 @@ import uploadRoute from "./route/upload.route.js";
 import aboutUsRoute from "./route/aboutUs.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
+import serviceRoute from './route/service.route.js';
+import thingsToDoRoute from './route/thingsToDo.route.js';
+
 const app = express();
 const PORT = application.PORT;
 
@@ -22,12 +25,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 //endpoints
-
+app.use('/api/auth', authRoute);
 app.use("/api/home", homeRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/aboutus", aboutUsRoute);
-app.use('/api/auth', authRoute);
-
+app.use('/api/service', serviceRoute);
+app.use('/api/things-to-do', thingsToDoRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
