@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 
 const aboutUsSchema = new mongoose.Schema({
+    // Hero section (single object)
+    hero: {
+        heroBackground: String,  // Background image URL
+        heroTitle: String,       // Main title (e.g., "We Create")
+        heroDescription: String  // Subtitle/description
+    },
+
     // Stats section (single object)
     stats: {
         yearExperience: Number,
