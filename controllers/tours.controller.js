@@ -47,12 +47,16 @@ export const tourCreate = async (req, res) => {
 
 export const tourEdit = async (req, res) => {
     try {
+        console.log('Edit request received for ID:', req.params.id);
+        console.log('Request body:', req.body);
+
         const existingTour = await Tour.findById(req.params.id);
         if (!existingTour) {
             return res.status(404).json({ error: "Tour not found" });
         }
 
         const tourData = { ...req.body };
+        console.log('Tour data to update:', tourData);
 
         // Handle image uploads if any
         if (req.files && req.files.images) {
@@ -87,6 +91,7 @@ export const tourEdit = async (req, res) => {
             new: true,
         });
 
+        console.log('Updated tour:', tour);
         res.json({ tour, message: "Tour updated successfully" });
     } catch (error) {
         console.error('Update error:', error);

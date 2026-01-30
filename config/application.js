@@ -4,7 +4,11 @@ dotenv.config();
 export const application = {
   // Server
   PORT: process.env.PORT || 5000,
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
+  CLIENT_URL: (() => {
+    const url = process.env.CLIENT_URL || "http://localhost:5173";
+    // If multiple URLs are specified (comma-separated), return as array for CORS
+    return url.includes(',') ? url.split(',').map(u => u.trim()) : url;
+  })(),
 
   // Database
   MONGO_URL: process.env.MONGO_URL,

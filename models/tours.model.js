@@ -21,6 +21,15 @@ const toursSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        description: {
+            type: String,
+            default: '',
+        },
+        // Hero Image for category page
+        heroImage: {
+            type: String,
+            default: '',
+        },
         isActive: {
             type: Boolean,
             default: true,

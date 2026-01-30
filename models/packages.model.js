@@ -22,10 +22,6 @@ const packagesSchema = new mongoose.Schema(
                 type: String,
                 required: true,
             },
-            subtitle: {
-                type: String,
-                default: "",
-            },
             description: {
                 type: String,
                 default: "",
@@ -50,21 +46,6 @@ const packagesSchema = new mongoose.Schema(
             groupSize: {
                 type: String,
                 default: "2-15",
-            },
-            difficulty: {
-                type: String,
-                enum: ["Easy", "Moderate", "Challenging", "Difficult"],
-                default: "Easy",
-            },
-            price: {
-                amount: {
-                    type: Number,
-                    default: 0,
-                },
-                currency: {
-                    type: String,
-                    default: "USD",
-                },
             },
         },
         // Day by Day Itinerary
@@ -119,66 +100,7 @@ const packagesSchema = new mongoose.Schema(
                 },
             },
         ],
-        // Attractions/Highlights
-        attractions: [
-            {
-                title: {
-                    type: String,
-                    required: true,
-                },
-                description: {
-                    type: String,
-                    default: "",
-                },
-                image: {
-                    type: String,
-                    required: true,
-                },
-            },
-        ],
-        // Need to Know Section
-        needToKnow: {
-            title: {
-                type: String,
-                default: "You Need to Know",
-            },
-            items: {
-                type: [String],
-                default: [],
-            },
-        },
-        // Map Section
-        map: {
-            image: {
-                type: String,
-                default: "",
-            },
-            description: {
-                type: String,
-                default: "",
-            },
-        },
-        // What's Included/Excluded
-        included: {
-            type: [String],
-            default: [],
-        },
-        excluded: {
-            type: [String],
-            default: [],
-        },
-        // Recommendations
-        recommendedFor: {
-            type: [String],
-            default: [],
-        },
-        // Related Packages
-        relatedPackages: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "package",
-            },
-        ],
+
         // Status
         isActive: {
             type: Boolean,
