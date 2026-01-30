@@ -10,6 +10,7 @@ import authRoute from './route/auth.route.js';
 import serviceRoute from './route/service.route.js';
 import thingsToDoRoute from './route/thingsToDo.route.js';
 import contactUsRoute from './route/contactUs.route.js';
+import excursionRoute from './route/excursion.route.js';
 
 const app = express();
 const PORT = application.PORT;
@@ -33,6 +34,7 @@ app.use("/api/aboutus", aboutUsRoute);
 app.use('/api/service', serviceRoute);
 app.use('/api/things-to-do', thingsToDoRoute);
 app.use('/api/contactus', contactUsRoute);
+app.use('/api/excursion', excursionRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));

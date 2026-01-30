@@ -6,6 +6,7 @@ const excursionsSchema = new mongoose.Schema({
     description: String,
     category: String,
     time: String,
+    destination: String,
     slug: String
 }, { timestamps: true });
 
