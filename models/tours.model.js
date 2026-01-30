@@ -1,10 +1,40 @@
 import mongoose from "mongoose";
 
 const toursSchema = new mongoose.Schema(
-  {
-    tourname: String,
-  },
-  { timestamps: true },
+    {
+        title: {
+            type: String,
+            required: true,
+        },
+        images: {
+            type: [String],
+            required: true,
+            validate: {
+                validator: function (v) {
+                    return v && v.length === 2;
+                },
+                message: 'Tour must have exactly 2 images'
+            }
+        },
+        slug: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
+        },
+        displayOrder: {
+            type: Number,
+            default: 0,
+        }
+    },
+    { timestamps: true }
 );
+
+// Index for performance
+toursSchema.index({ slug: 1 });
+toursSchema.index({ isActive: 1, displayOrder: 1 });
 
 export default mongoose.model("tour", toursSchema);
