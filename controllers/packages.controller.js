@@ -5,7 +5,7 @@ export const packageGet = async (req, res) => {
     try {
         const packages = await Package.find({ isActive: true })
             .populate("tourCategory")
-            .populate("relatedPackages")
+
             .sort({ displayOrder: 1, createdAt: -1 });
         res.json({ packages });
     } catch (error) {
@@ -17,7 +17,7 @@ export const packageGetById = async (req, res) => {
     try {
         const pkg = await Package.findById(req.params.id)
             .populate("tourCategory")
-            .populate("relatedPackages");
+
         if (!pkg) {
             return res.status(404).json({ error: "Package not found" });
         }
@@ -31,7 +31,7 @@ export const packageGetBySlug = async (req, res) => {
     try {
         const pkg = await Package.findOne({ slug: req.params.slug })
             .populate("tourCategory")
-            .populate("relatedPackages");
+
         if (!pkg) {
             return res.status(404).json({ error: "Package not found" });
         }
