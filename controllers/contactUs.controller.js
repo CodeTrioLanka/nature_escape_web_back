@@ -1,36 +1,53 @@
 import contactUs from '../models/contactUs.model.js';
 
-export const getData = async (req, res) => {
+export const getContactUsData = async (req, res) => {
     try {
-        const data = await contactUs.find();
-        
-        res.status(200).json({
-            success: true,
-            message: "Contact us data fetched successfully",
-            data: data
-        });
+        const contactData = await contactUs.findOne();
+        if (!contactData) {
+            return res.status(200).json({
+                email: "",
+                phone: "",
+                address: "",
+                googleMap: "",
+                socials: { facebook: "", instagram: "", twitter: "" }
+            });
+        }
+        res.status(200).json(contactData);
     } catch (error) {
-        res.status(500).json({
-            error: "Failed to get contact us data",
-            details: error.message
-        });
+        res.status(500).json({ message: error.message });
     }
 };
 
-export const setData = async (req, res) => {
+export const setContactUsData = async (req, res) => {
     try {
-        const contactUsData = new contactUs(req.body);
-        const savedData = await contactUsData.save(); 
+        const { email, phone, address, googleMap, socials } = req.body;
 
-        res.status(201).json({
-            success: true,
-            message: "Contact us data saved successfully",
-            data: savedData
-        });
+        // Check if a document already exists
+        let contactData = await contactUs.findOne();
+
+        if (contactData) {
+            // Update existing document
+            contactData.email = email;
+            contactData.phone = phone;
+            contactData.address = address;
+            contactData.googleMap = googleMap;
+            contactData.socials = socials;
+
+            await contactData.save();
+        } else {
+            // Create new document
+            contactData = new contactUs({
+                email,
+                phone,
+                address,
+                googleMap,
+                socials
+            });
+            await contactData.save();
+        }
+
+        res.status(200).json(contactData);
     } catch (error) {
-        res.status(500).json({
-            error: "Failed to set contact us data",     
-            details: error.message
-        });
-    }   
-}; 
+        res.status(500).json({ message: error.message });
+    }
+};

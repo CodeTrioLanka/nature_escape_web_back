@@ -9,6 +9,11 @@ import toursRoute from "./route/tours.route.js";
 import packagesRoute from "./route/packages.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
+import serviceRoute from './route/service.route.js';
+import thingsToDoRoute from './route/thingsToDo.route.js';
+import contactUsRoute from './route/contactUs.route.js';
+import excursionRoute from './route/excursion.route.js';
+
 const app = express();
 const PORT = application.PORT;
 
@@ -24,14 +29,16 @@ app.use(express.json());
 app.use(cookieParser());
 
 //endpoints
-
+app.use('/api/auth', authRoute);
 app.use("/api/home", homeRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/aboutus", aboutUsRoute);
 app.use("/api/tours", toursRoute);
 app.use("/api/packages", packagesRoute);
-app.use('/api/auth', authRoute);
-
+app.use('/api/service', serviceRoute);
+app.use('/api/things-to-do', thingsToDoRoute);
+app.use('/api/contactus', contactUsRoute);
+app.use('/api/excursion', excursionRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
