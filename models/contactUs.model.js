@@ -1,21 +1,22 @@
 import mongoose from "mongoose";
 
 const contactUsSchema = new mongoose.Schema({
+
     email: {
-        type: String,
+        type: [String],
         required: true,
     },
     phone: {
-        type: String,
+        type: [String],
         required: true,
     },
     address: {
-        type: String,
+        type: [String],
         required: true,
     },
     googleMap: {
         type: String,
-        required: true,
+        required: false,
     },
     socials: {
         facebook: { type: String, default: "" },

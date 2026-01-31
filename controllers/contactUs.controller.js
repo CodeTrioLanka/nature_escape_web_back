@@ -5,9 +5,10 @@ export const getContactUsData = async (req, res) => {
         const contactData = await contactUs.findOne();
         if (!contactData) {
             return res.status(200).json({
-                email: "",
-                phone: "",
-                address: "",
+
+                email: [],
+                phone: [],
+                address: [],
                 googleMap: "",
                 socials: { facebook: "", instagram: "", twitter: "" }
             });
