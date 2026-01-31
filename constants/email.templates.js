@@ -258,3 +258,154 @@ export const welcomeTemplate = (name, email, password) => ({
 //   </body>
 // </html>
 // `;
+
+export const contactUsUserTemplate = (firstName) => ({
+  subject: "Thank you for contacting us",
+  html: `
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        line-height: 1.6;
+        color: #000000;
+        background: #f5f5f5;
+        padding: 0;
+        margin: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 0;
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e5e5e5;
+      }
+      .header {
+        background-color: #ffffff;
+        color: #000000;
+        padding: 24px;
+        text-align: center;
+        border-bottom: 3px solid #000000;
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .content {
+        background-color: #ffffff;
+        padding: 30px;
+        color: #000000;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+        font-size: 12px;
+      }
+      strong {
+        color: #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        Thank You!
+      </div>
+      <div class="content">
+        <p>Hi <strong>${firstName}</strong>,</p>
+        <p>Thank you for contacting us. We have received your message and will get back to you as soon as possible.</p>
+        <p>Best regards,<br>
+        The Team</p>
+      </div>
+      <div class="footer">
+        This is an automated email. Please do not reply.
+      </div>
+    </div>
+  </body>
+</html>
+`
+});
+
+export const contactUsAdminTemplate = (data) => ({
+  subject: `New Contact Form Submission: ${data.subject}`,
+  html: `
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        line-height: 1.6;
+        color: #000000;
+        background: #f5f5f5;
+        padding: 0;
+        margin: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 0;
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e5e5e5;
+      }
+      .header {
+        background-color: #000000;
+        color: #ffffff;
+        padding: 24px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .content {
+        background-color: #ffffff;
+        padding: 30px;
+        color: #000000;
+      }
+      .field {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+      }
+      .label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .value {
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        New Contact Inquiry
+      </div>
+      <div class="content">
+        <div class="field">
+          <span class="label">Name:</span>
+          <span class="value">${data.firstName} ${data.lastName}</span>
+        </div>
+        <div class="field">
+          <span class="label">Email:</span>
+          <span class="value">${data.email}</span>
+        </div>
+        <div class="field">
+          <span class="label">Subject:</span>
+          <span class="value">${data.subject}</span>
+        </div>
+        <div class="field">
+          <span class="label">Message:</span>
+          <span class="value">${data.message}</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+`
+});
