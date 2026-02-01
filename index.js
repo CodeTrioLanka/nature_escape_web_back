@@ -9,9 +9,8 @@ import toursRoute from "./route/tours.route.js";
 import packagesRoute from "./route/packages.route.js";
 import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
-import serviceRoute from './route/service.route.js';
 import thingsToDoRoute from './route/thingsToDo.route.js';
-import serviceHeroRoute from './route/serviceHero.route.js';
+import servicePageRoute from './route/servicePage.route.js';
 
 import contactUsRoute from './route/contactUs.route.js';
 import excursionRoute from './route/excursion.route.js';
@@ -38,9 +37,8 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/aboutus", aboutUsRoute);
 app.use("/api/tours", toursRoute);
 app.use("/api/packages", packagesRoute);
-app.use('/api/service', serviceRoute);
 app.use('/api/things-to-do', thingsToDoRoute);
-app.use('/api/service-hero', serviceHeroRoute);
+app.use('/api/service-page', servicePageRoute);
 
 app.use('/api/contactus', contactUsRoute);
 app.use('/api/message', messageRoute);

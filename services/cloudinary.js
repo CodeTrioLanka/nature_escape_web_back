@@ -10,7 +10,7 @@ cloudinary.config({
 export const uploadToCloudinary = async (file) => {
   try {
     let result;
-    
+
     // Handle buffer (memory storage)
     if (Buffer.isBuffer(file)) {
       result = await new Promise((resolve, reject) => {
@@ -22,22 +22,55 @@ export const uploadToCloudinary = async (file) => {
           }
         ).end(file);
       });
-    } 
+    }
     // Handle file path (disk storage)
     else {
       result = await cloudinary.uploader.upload(file);
     }
-    
+
     return result.secure_url;
   } catch (error) {
     throw error;
   }
 };
 
-export const deleteFromCloudinary = async (imageUrl) => {
+// Helper to extract public ID from Cloudinary URL
+const getPublicIdFromUrl = (url) => {
   try {
-    const publicId = imageUrl.split('/').pop().split('.')[0];
-    await cloudinary.uploader.destroy(publicId);
+    // Cloudinary URL format: https://res.cloudinary.com/[cloud_name]/image/upload/v[version]/[public_id].[ext]
+    // Or with folders: https://res.cloudinary.com/[cloud_name]/image/upload/v[version]/folder/[public_id].[ext]
+    const splitUrl = url.split('/');
+    const lastPart = splitUrl[splitUrl.length - 1]; // [public_id].[ext]
+    const publicIdWithExt = lastPart;
+
+    // Find index of 'upload/'
+    const uploadIndex = splitUrl.findIndex(part => part === 'upload');
+    if (uploadIndex === -1) return null;
+
+    // Everything after v[version]/ is the public ID
+    // Find the part that starts with 'v' followed by numbers
+    const versionIndex = splitUrl.findIndex(part => /^v\d+/.test(part));
+
+    if (versionIndex !== -1 && versionIndex < splitUrl.length - 1) {
+      const publicIdParts = splitUrl.slice(versionIndex + 1);
+      const publicIdWithExt = publicIdParts.join('/');
+      return publicIdWithExt.split('.')[0];
+    }
+
+    return publicIdWithExt.split('.')[0];
+  } catch (error) {
+    console.error('Error parsing public ID:', error);
+    return null;
+  }
+};
+
+export const deleteFromCloudinary = async (imageUrl) => {
+  if (!imageUrl || !imageUrl.includes('cloudinary.com')) return;
+  try {
+    const publicId = getPublicIdFromUrl(imageUrl);
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId);
+    }
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
   }
