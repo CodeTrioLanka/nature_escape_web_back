@@ -47,15 +47,36 @@ app.use('/api/excursion', excursionRoute);
 app.use('/api/reviews', reviewRoute);
 
 // Health check
+// Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-try {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-  console.log("Connected to MongoDB");
-} catch (error) {
-  console.error("Failed to start server:", error);
-  process.exit(1);
+// Connect to DB functions
+const connect = async () => {
+  try {
+    await connectDB();
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
+};
+
+// Start server if running directly
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    await connect();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
+
+// Export for Vercel
+export default async (req, res) => {
+  await connect();
+  app(req, res);
+};

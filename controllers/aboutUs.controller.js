@@ -35,6 +35,9 @@ export const setData = async (req, res) => {
                 aboutUsData.hero.heroDescription = req.body['hero[heroDescription]'];
             }
             // Clean up the flat fields
+            if (req.body['hero[heroBackground]']) {
+                aboutUsData.hero.heroBackground = req.body['hero[heroBackground]'];
+            }
             delete aboutUsData['hero[heroTitle]'];
             delete aboutUsData['hero[heroDescription]'];
             delete aboutUsData['hero[heroBackground]'];
@@ -110,6 +113,9 @@ export const updateData = async (req, res) => {
                 aboutUsData.hero.heroDescription = req.body['hero[heroDescription]'];
             }
             // Clean up the flat fields
+            if (req.body['hero[heroBackground]']) {
+                aboutUsData.hero.heroBackground = req.body['hero[heroBackground]'];
+            }
             delete aboutUsData['hero[heroTitle]'];
             delete aboutUsData['hero[heroDescription]'];
             delete aboutUsData['hero[heroBackground]'];
