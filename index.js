@@ -77,6 +77,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Export for Vercel
 export default async (req, res) => {
-  await connect();
-  app(req, res);
+  try {
+    await connect();
+    app(req, res);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ error: "Server internal error", details: error.message });
+  }
 };
