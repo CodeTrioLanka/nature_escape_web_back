@@ -1,4 +1,4 @@
-import aboutUs from "../models/aboutUs.model.js";
+import aboutUs from "../models/aboutus.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
 
 
