@@ -11,7 +11,6 @@ import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
 import thingsToDoRoute from './route/thingsToDo.route.js';
 import servicePageRoute from './route/servicePage.route.js';
-
 import contactUsRoute from './route/contactUs.route.js';
 import excursionRoute from './route/excursion.route.js';
 import messageRoute from './route/message.route.js';
@@ -19,26 +18,6 @@ import reviewRoute from './route/review.route.js';
 
 const app = express();
 const PORT = application.PORT;
-
-// Connect to DB functions
-const connect = async () => {
-  try {
-    await connectDB();
-  } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
-    throw error;
-  }
-};
-
-// Middleware to ensure DB connection
-app.use(async (req, res, next) => {
-  try {
-    await connect();
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 // Middleware
 app.use(
@@ -60,7 +39,6 @@ app.use("/api/tours", toursRoute);
 app.use("/api/packages", packagesRoute);
 app.use('/api/things-to-do', thingsToDoRoute);
 app.use('/api/service-page', servicePageRoute);
-
 app.use('/api/contactus', contactUsRoute);
 app.use('/api/message', messageRoute);
 app.use('/api/excursion', excursionRoute);
@@ -69,21 +47,18 @@ app.use('/api/reviews', reviewRoute);
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: "Internal Server Error",
-    details: err.message
-  });
-});
-
-// Start server if running directly
-import { fileURLToPath } from 'url';
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+// Connect to DB and start server (only when running locally)
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
 // Export for Vercel
