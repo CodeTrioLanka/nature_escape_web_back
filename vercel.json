@@ -2,5 +2,10 @@
   "version": 2,
   "github": {
     "silent": true
+  },
+  "build": {
+    "env": {
+      "FORCE_REBUILD": "1"
+    }
   }
 }
