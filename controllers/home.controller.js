@@ -1,6 +1,6 @@
 import Home from "../models/home.model.js";
-import { uploadToCloudinary ,deleteFromCloudinary  } from "../services/cloudinary.js";
-import fs from "fs";
+import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
+
 
 export const homeGet = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ export const homeGet = async (req, res) => {
 //   try {
 //     // console.log('Request Body:', req.body);
 //     // console.log('Request Files:', req.files);
-    
+
 //     const homeData = { ...req.body };
 
 //     const imageFields = [
@@ -32,7 +32,7 @@ export const homeGet = async (req, res) => {
 //         const cloudinaryUrl = await uploadToCloudinary(file.path);
 //         homeData[field] = cloudinaryUrl;
 //         console.log(`${field} uploaded:`, cloudinaryUrl);
-        
+
 //         fs.unlinkSync(file.path);
 //       }
 //     }
@@ -54,9 +54,8 @@ export const homeCretae = async (req, res) => {
     if (req.files && req.files.gallery) {
       const galleryUrls = [];
       for (const file of req.files.gallery) {
-        const cloudinaryUrl = await uploadToCloudinary(file.path);
+        const cloudinaryUrl = await uploadToCloudinary(file.buffer);
         galleryUrls.push(cloudinaryUrl);
-        fs.unlinkSync(file.path);
       }
       homeData.gallery = galleryUrls;
     }
@@ -66,9 +65,8 @@ export const homeCretae = async (req, res) => {
     for (const field of singleImageFields) {
       if (req.files && req.files[field]) {
         const file = req.files[field][0];
-        const cloudinaryUrl = await uploadToCloudinary(file.path);
+        const cloudinaryUrl = await uploadToCloudinary(file.buffer);
         homeData[field] = cloudinaryUrl;
-        fs.unlinkSync(file.path);
       }
     }
 
@@ -80,44 +78,6 @@ export const homeCretae = async (req, res) => {
 };
 
 
-// export const homeEdit = async (req, res) => {
-//   try {
-//     //     console.log('PUT Request Body:', req.body);
-//     // console.log('PUT Request Files:', req.files);
-    
-//     const existingHome = await Home.findById(req.params.id);
-//     if (!existingHome) {
-//       return res.status(404).json({ error: "Home not found" });
-//     }
-
-//     const homeData = { ...req.body };
-//     const imageFields = ['gallery', 'homebg', 'destinationImage', 'personalizedImage'];
-
-//     for (const field of imageFields) {
-//       if (req.files && req.files[field]) {
-//         // Delete old image from Cloudinary if exists
-//         if (existingHome[field]) {
-//           await deleteFromCloudinary(existingHome[field]);
-//         }
-        
-//         // Upload new image
-//         const file = req.files[field][0];
-//         const cloudinaryUrl = await uploadToCloudinary(file.path);
-//         homeData[field] = cloudinaryUrl;
-        
-//         fs.unlinkSync(file.path);
-//       }
-//     }
-
-//     const home = await Home.findByIdAndUpdate(req.params.id, homeData, {
-//       new: true,
-//     });
-    
-//     res.json({ home, message: "Home updated successfully" });
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
 export const homeEdit = async (req, res) => {
   try {
     const existingHome = await Home.findById(req.params.id);
@@ -127,19 +87,18 @@ export const homeEdit = async (req, res) => {
 
     const homeData = { ...req.body };
 
-    // Handle file uploads if any (for backward compatibility)
+    // Handle file uploads if any
     if (req.files && req.files.gallery) {
       if (existingHome.gallery && existingHome.gallery.length > 0) {
         for (const imageUrl of existingHome.gallery) {
           await deleteFromCloudinary(imageUrl);
         }
       }
-      
+
       const galleryUrls = [];
       for (const file of req.files.gallery) {
-        const cloudinaryUrl = await uploadToCloudinary(file.path);
+        const cloudinaryUrl = await uploadToCloudinary(file.buffer);
         galleryUrls.push(cloudinaryUrl);
-        fs.unlinkSync(file.path);
       }
       homeData.gallery = galleryUrls;
     }
@@ -150,11 +109,10 @@ export const homeEdit = async (req, res) => {
         if (existingHome[field]) {
           await deleteFromCloudinary(existingHome[field]);
         }
-        
+
         const file = req.files[field][0];
-        const cloudinaryUrl = await uploadToCloudinary(file.path);
+        const cloudinaryUrl = await uploadToCloudinary(file.buffer);
         homeData[field] = cloudinaryUrl;
-        fs.unlinkSync(file.path);
       }
       // Handle direct URL updates (when images are pre-uploaded)
       else if (homeData[field] && homeData[field] !== existingHome[field]) {
@@ -180,7 +138,7 @@ export const homeEdit = async (req, res) => {
     const home = await Home.findByIdAndUpdate(req.params.id, homeData, {
       new: true,
     });
-    
+
     res.json({ home, message: "Home updated successfully" });
   } catch (error) {
     console.error('Update error:', error);

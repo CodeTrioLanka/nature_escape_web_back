@@ -1,6 +1,6 @@
 import Tour from "../models/tours.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
-import fs from "fs";
+
 
 export const tourGet = async (req, res) => {
     try {
