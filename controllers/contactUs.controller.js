@@ -1,4 +1,5 @@
 import contactUs from '../models/contactUs.model.js';
+import { logAction } from '../utils/logger.js';
 
 export const getContactUsData = async (req, res) => {
     try {
@@ -45,6 +46,15 @@ export const setContactUsData = async (req, res) => {
                 socials
             });
             await contactData.save();
+        }
+
+        // Log the action
+        if (req.user) {
+            const action = contactData.isNew ? "CREATE_CONTACT_PAGE" : "UPDATE_CONTACT_PAGE";
+            await logAction(req.user, action, {
+                contactId: contactData._id,
+                updatedFields: Object.keys(req.body)
+            });
         }
 
         res.status(200).json(contactData);

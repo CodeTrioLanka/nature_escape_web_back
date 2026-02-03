@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/user.model.js';
 import { signAccessToken, signRefreshToken, verifyAccessToken } from '../utils/jwt.js';
-import { loginSchema, registerSchema } from '../validators/auth.schema.js';
+import { loginSchema, registerSchema, changePasswordSchema } from '../validators/auth.schema.js';
+import { logAction } from '../utils/logger.js';
 
 export const register = async (req, res) => {
   try {
@@ -39,6 +40,19 @@ export const register = async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Log the action (for admin/superadmin registrations)
+    const userForLogging = {
+      sub: user._id,
+      role: user.role,
+      email: user.email,
+      username: user.email
+    };
+    await logAction(userForLogging, "REGISTER_USER", {
+      userId: user._id,
+      email: user.email,
+      role: user.role
     });
 
     res.status(201).json({
@@ -82,6 +96,19 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Log the action (for admin/superadmin logins)
+    const userForLogging = {
+      sub: user._id,
+      role: user.role,
+      email: user.email,
+      username: user.username || user.email
+    };
+    await logAction(userForLogging, "USER_LOGIN", {
+      userId: user._id,
+      email: user.email,
+      role: user.role
+    });
+
     res.json({
       message: 'Logged in',
       user: { id: user._id, email: user.email, role: user.role }
@@ -105,8 +132,56 @@ export const me = async (req, res) => {
     }
 
     const payload = verifyAccessToken(token);
-    res.json({ user: { id: payload.sub, role: payload.role } });
+
+    // Fetch user details from database to get email and username
+    const user = await User.findById(payload.sub);
+    if (!user) {
+      return res.json({ user: null });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        sub: user._id, // Include sub for compatibility with logAction
+        email: user.email,
+        username: user.username || user.email, // Fallback to email if no username
+        role: user.role
+      }
+    });
   } catch (error) {
     res.json({ user: null });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+    const userId = req.user.sub || req.user.id; // Support both sub (jwt) and id properties
+
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Invalid current password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Log the action
+    if (req.user) {
+      await logAction(req.user, "CHANGE_PASSWORD", {
+        userId: user._id,
+        email: user.email
+      });
+    }
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };

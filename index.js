@@ -11,11 +11,11 @@ import { application } from "./config/application.js";
 import authRoute from './route/auth.route.js';
 import thingsToDoRoute from './route/thingsToDo.route.js';
 import servicePageRoute from './route/servicePage.route.js';
-
 import contactUsRoute from './route/contactUs.route.js';
 import excursionRoute from './route/excursion.route.js';
 import messageRoute from './route/message.route.js';
 import reviewRoute from './route/review.route.js';
+import logRoute from './route/log.route.js';
 
 const app = express();
 const PORT = application.PORT;
@@ -40,22 +40,28 @@ app.use("/api/tours", toursRoute);
 app.use("/api/packages", packagesRoute);
 app.use('/api/things-to-do', thingsToDoRoute);
 app.use('/api/service-page', servicePageRoute);
-
 app.use('/api/contactus', contactUsRoute);
 app.use('/api/message', messageRoute);
 app.use('/api/excursion', excursionRoute);
 app.use('/api/reviews', reviewRoute);
+app.use('/api/logs', logRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-try {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-  console.log("Connected to MongoDB");
-} catch (error) {
-  console.error("Failed to start server:", error);
-  process.exit(1);
+// Connect to DB and start server (only when running locally)
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
+
+// Export for Vercel
+export default app;

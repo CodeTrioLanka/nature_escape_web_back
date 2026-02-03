@@ -1,6 +1,7 @@
 import aboutUs from "../models/aboutUs.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
-import fs from "fs";
+import { logAction } from "../utils/logger.js";
+
 
 export const getData = async (req, res) => {
     try {
@@ -35,6 +36,9 @@ export const setData = async (req, res) => {
                 aboutUsData.hero.heroDescription = req.body['hero[heroDescription]'];
             }
             // Clean up the flat fields
+            if (req.body['hero[heroBackground]']) {
+                aboutUsData.hero.heroBackground = req.body['hero[heroBackground]'];
+            }
             delete aboutUsData['hero[heroTitle]'];
             delete aboutUsData['hero[heroDescription]'];
             delete aboutUsData['hero[heroBackground]'];
@@ -45,16 +49,11 @@ export const setData = async (req, res) => {
             // Process hero background image
             const heroBackgroundFile = req.files.find(file => file.fieldname === 'hero[heroBackground]');
             if (heroBackgroundFile) {
-                const filePath = heroBackgroundFile.path || heroBackgroundFile.buffer;
-                const cloudinaryUrl = await uploadToCloudinary(filePath);
+                const cloudinaryUrl = await uploadToCloudinary(heroBackgroundFile.buffer);
                 if (!aboutUsData.hero) {
                     aboutUsData.hero = {};
                 }
                 aboutUsData.hero.heroBackground = cloudinaryUrl;
-
-                if (heroBackgroundFile.path) {
-                    fs.unlinkSync(heroBackgroundFile.path);
-                }
             }
 
             // Process team member images
@@ -62,19 +61,22 @@ export const setData = async (req, res) => {
                 for (let i = 0; i < aboutUsData.team.length; i++) {
                     const imageFile = req.files.find(file => file.fieldname === `team[${i}][image]`);
                     if (imageFile) {
-                        const filePath = imageFile.path || imageFile.buffer;
-                        const cloudinaryUrl = await uploadToCloudinary(filePath);
+                        const cloudinaryUrl = await uploadToCloudinary(imageFile.buffer);
                         aboutUsData.team[i].image = cloudinaryUrl;
-
-                        if (imageFile.path) {
-                            fs.unlinkSync(imageFile.path);
-                        }
                     }
                 }
             }
         }
 
         const savedData = await aboutUs.create(aboutUsData);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_ABOUT_PAGE", {
+                aboutId: savedData._id,
+                title: savedData.hero?.heroTitle || "About Us Page"
+            });
+        }
 
         res.status(201).json({
             success: true,
@@ -110,6 +112,9 @@ export const updateData = async (req, res) => {
                 aboutUsData.hero.heroDescription = req.body['hero[heroDescription]'];
             }
             // Clean up the flat fields
+            if (req.body['hero[heroBackground]']) {
+                aboutUsData.hero.heroBackground = req.body['hero[heroBackground]'];
+            }
             delete aboutUsData['hero[heroTitle]'];
             delete aboutUsData['hero[heroDescription]'];
             delete aboutUsData['hero[heroBackground]'];
@@ -125,16 +130,11 @@ export const updateData = async (req, res) => {
                     await deleteFromCloudinary(existingData.hero.heroBackground);
                 }
 
-                const filePath = heroBackgroundFile.path || heroBackgroundFile.buffer;
-                const cloudinaryUrl = await uploadToCloudinary(filePath);
+                const cloudinaryUrl = await uploadToCloudinary(heroBackgroundFile.buffer);
                 if (!aboutUsData.hero) {
                     aboutUsData.hero = {};
                 }
                 aboutUsData.hero.heroBackground = cloudinaryUrl;
-
-                if (heroBackgroundFile.path) {
-                    fs.unlinkSync(heroBackgroundFile.path);
-                }
             }
 
             // Process team member images
@@ -147,13 +147,8 @@ export const updateData = async (req, res) => {
                             await deleteFromCloudinary(existingData.team[i].image);
                         }
 
-                        const filePath = imageFile.path || imageFile.buffer;
-                        const cloudinaryUrl = await uploadToCloudinary(filePath);
+                        const cloudinaryUrl = await uploadToCloudinary(imageFile.buffer);
                         aboutUsData.team[i].image = cloudinaryUrl;
-
-                        if (imageFile.path) {
-                            fs.unlinkSync(imageFile.path);
-                        }
                     }
                 }
             }
@@ -162,6 +157,14 @@ export const updateData = async (req, res) => {
         const updatedData = await aboutUs.findByIdAndUpdate(req.params.id, aboutUsData, {
             new: true,
         });
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_ABOUT_PAGE", {
+                aboutId: updatedData._id,
+                updatedFields: Object.keys(aboutUsData)
+            });
+        }
 
         res.json({
             success: true,
@@ -198,6 +201,14 @@ export const deleteData = async (req, res) => {
         }
 
         await aboutUs.findByIdAndDelete(req.params.id);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_ABOUT_PAGE", {
+                aboutId: data._id
+            });
+        }
+
         res.json({
             success: true,
             message: "About us data deleted successfully"

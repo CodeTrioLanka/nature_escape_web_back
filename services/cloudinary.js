@@ -25,7 +25,9 @@ export const uploadToCloudinary = async (file) => {
     }
     // Handle file path (disk storage)
     else {
-      result = await cloudinary.uploader.upload(file);
+      result = await cloudinary.uploader.upload(file, {
+        resource_type: 'auto'
+      });
     }
 
     return result.secure_url;
@@ -69,7 +71,13 @@ export const deleteFromCloudinary = async (imageUrl) => {
   try {
     const publicId = getPublicIdFromUrl(imageUrl);
     if (publicId) {
-      await cloudinary.uploader.destroy(publicId);
+      // Detect if it's a video based on the URL
+      const isVideo = imageUrl.includes('/video/upload/');
+      const resourceType = isVideo ? 'video' : 'image';
+
+      await cloudinary.uploader.destroy(publicId, {
+        resource_type: resourceType
+      });
     }
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);

@@ -1,6 +1,7 @@
 import { sendEmail } from '../services/email.service.js';
 import { contactUsUserTemplate, contactUsAdminTemplate } from '../constants/email.templates.js';
 import { application } from '../config/application.js';
+import { logAction } from '../utils/logger.js';
 
 export const submitContactForm = async (req, res) => {
     try {
@@ -27,6 +28,15 @@ export const submitContactForm = async (req, res) => {
             subject: adminEmailContent.subject,
             html: adminEmailContent.html
         });
+
+        // Log the action (only if admin is testing the form)
+        if (req.user) {
+            await logAction(req.user, "CONTACT_FORM_SUBMISSION", {
+                senderEmail: email,
+                senderName: `${firstName} ${lastName}`,
+                subject
+            });
+        }
 
         res.status(200).json({ message: "Message sent successfully" });
     } catch (error) {

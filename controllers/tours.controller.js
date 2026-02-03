@@ -1,6 +1,7 @@
 import Tour from "../models/tours.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
-import fs from "fs";
+import { logAction } from "../utils/logger.js";
+
 
 export const tourGet = async (req, res) => {
     try {
@@ -23,6 +24,18 @@ export const tourGetById = async (req, res) => {
     }
 };
 
+export const tourGetBySlug = async (req, res) => {
+    try {
+        const tour = await Tour.findOne({ slug: req.params.slug });
+        if (!tour) {
+            return res.status(404).json({ error: "Tour category not found" });
+        }
+        res.json({ tour });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch tour category" });
+    }
+};
+
 export const tourCreate = async (req, res) => {
     try {
         const tourData = { ...req.body };
@@ -39,6 +52,16 @@ export const tourCreate = async (req, res) => {
         }
 
         const tour = await Tour.create(tourData);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_TOUR", {
+                tourId: tour._id,
+                tourName: tour.name,
+                slug: tour.slug
+            });
+        }
+
         res.status(201).json({ tour, message: "Tour created successfully" });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -91,6 +114,16 @@ export const tourEdit = async (req, res) => {
             new: true,
         });
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_TOUR", {
+                tourId: tour._id,
+                tourName: tour.name,
+                slug: tour.slug,
+                updatedFields: Object.keys(tourData)
+            });
+        }
+
         console.log('Updated tour:', tour);
         res.json({ tour, message: "Tour updated successfully" });
     } catch (error) {
@@ -114,6 +147,16 @@ export const tourDelete = async (req, res) => {
         }
 
         await Tour.findByIdAndDelete(req.params.id);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_TOUR", {
+                tourId: tour._id,
+                tourName: tour.name,
+                slug: tour.slug
+            });
+        }
+
         res.json({ message: "Tour deleted successfully" });
     } catch (error) {
         res.status(400).json({ error: error.message });
