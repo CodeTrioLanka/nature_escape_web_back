@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { tourCreate, tourGet, tourGetById, tourEdit, tourDelete } from "../controllers/tours.controller.js";
+import { tourCreate, tourGet, tourGetById, tourGetBySlug, tourEdit, tourDelete } from "../controllers/tours.controller.js";
 import { upload } from "../middleware/upload.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -17,11 +18,13 @@ const handleBothFormats = (req, res, next) => {
 };
 
 router.get("/", tourGet);
+router.get("/slug/:slug", tourGetBySlug);
 router.get("/:id", tourGetById);
-router.post("/", upload.fields([
+router.post("/", authenticate, upload.fields([
     { name: "images", maxCount: 2 }
 ]), tourCreate);
-router.put("/:id", handleBothFormats, tourEdit);
-router.delete("/:id", tourDelete);
+router.put("/:id", authenticate, handleBothFormats, tourEdit);
+router.delete("/:id", authenticate, tourDelete);
 
 export default router;
+

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getData, setData, updateData, deleteData } from "../controllers/aboutUs.controller.js";
 import { upload } from "../middleware/upload.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -15,8 +16,8 @@ const handleBothFormats = (req, res, next) => {
 };
 
 router.get("/getData", getData);
-router.post("/setData", upload.any(), setData);
-router.put("/:id", handleBothFormats, updateData);
-router.delete("/:id", deleteData);
+router.post("/setData", authenticate, upload.any(), setData);
+router.put("/:id", authenticate, handleBothFormats, updateData);
+router.delete("/:id", authenticate, deleteData);
 
 export default router;

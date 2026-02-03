@@ -11,6 +11,7 @@ import {
     syncGoogleReviews,
     getReviewStats
 } from '../controllers/review.controller.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -24,26 +25,26 @@ router.get('/public', getPublicReviews);
 // Get review statistics
 router.get('/stats', getReviewStats);
 
-// ==================== ADMIN ROUTES (No Auth Required) ====================
+// ==================== ADMIN ROUTES (No Auth Required) -> (Auth Required) ====================
 // Get all reviews with moderation status
-router.get('/all', getAllReviews);
+router.get('/all', authenticate, getAllReviews);
 
 // Add admin review
-router.post('/admin', addAdminReview);
+router.post('/admin', authenticate, addAdminReview);
 
 // Update review
-router.put('/:id', updateReview);
+router.put('/:id', authenticate, updateReview);
 
 // Delete review
-router.delete('/:id', deleteReview);
+router.delete('/:id', authenticate, deleteReview);
 
 // Approve user review
-router.patch('/:id/approve', approveReview);
+router.patch('/:id/approve', authenticate, approveReview);
 
 // Toggle visibility
-router.patch('/:id/visibility', toggleVisibility);
+router.patch('/:id/visibility', authenticate, toggleVisibility);
 
 // Sync Google reviews
-router.get('/google/sync', syncGoogleReviews);
+router.get('/google/sync', authenticate, syncGoogleReviews);
 
 export default router;

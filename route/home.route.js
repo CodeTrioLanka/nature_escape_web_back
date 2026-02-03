@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { homeCretae, homeGet, homeEdit, homeDelete } from "../controllers/home.controller.js";
 import { upload } from "../middleware/upload.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -20,14 +21,15 @@ const handleBothFormats = (req, res, next) => {
 };
 
 router.get("/", homeGet);
-router.post("/", upload.fields([
+router.post("/", authenticate, upload.fields([
   { name: "gallery", maxCount: 10 },
   { name: "homebg", maxCount: 1 },
   { name: "destinationImage", maxCount: 1 },
   { name: "personalizedImage", maxCount: 1 },
 ]), homeCretae);
-router.put("/:id", handleBothFormats, homeEdit);
+router.put("/:id", authenticate, handleBothFormats, homeEdit);
 
-router.delete("/:id", homeDelete);
+router.delete("/:id", authenticate, homeDelete);
 
 export default router;
+

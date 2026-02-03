@@ -1,5 +1,6 @@
 import Package from "../models/packages.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
+import { logAction } from "../utils/logger.js";
 
 export const packageGet = async (req, res) => {
     try {
@@ -47,7 +48,7 @@ export const packageGetByCategory = async (req, res) => {
             tourCategory: req.params.categoryId,
             isActive: true
         })
-            .populate("tourCategory")
+            .select("_id slug packageName overview.duration hero.backgroundImage hero.title displayOrder")
             .sort({ displayOrder: 1, createdAt: -1 });
         res.json({ packages });
     } catch (error) {
@@ -97,6 +98,17 @@ export const packageCreate = async (req, res) => {
         }
 
         const pkg = await Package.create(packageData);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_PACKAGE", {
+                packageId: pkg._id,
+                packageName: pkg.packageName,
+                slug: pkg.slug,
+                tourCategory: pkg.tourCategory
+            });
+        }
+
         res.status(201).json({ package: pkg, message: "Package created successfully" });
     } catch (error) {
         console.error('Create error:', error);
@@ -186,6 +198,16 @@ export const packageEdit = async (req, res) => {
             new: true,
         });
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_PACKAGE", {
+                packageId: pkg._id,
+                packageName: pkg.packageName,
+                slug: pkg.slug,
+                updatedFields: Object.keys(packageData)
+            });
+        }
+
         res.json({ package: pkg, message: "Package updated successfully" });
     } catch (error) {
         console.error('Update error:', error);
@@ -240,6 +262,16 @@ export const packageDelete = async (req, res) => {
         }
 
         await Package.findByIdAndDelete(req.params.id);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_PACKAGE", {
+                packageId: pkg._id,
+                packageName: pkg.packageName,
+                slug: pkg.slug
+            });
+        }
+
         res.json({ message: "Package deleted successfully" });
     } catch (error) {
         res.status(400).json({ error: error.message });

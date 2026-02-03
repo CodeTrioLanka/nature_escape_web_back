@@ -15,6 +15,7 @@ import contactUsRoute from './route/contactUs.route.js';
 import excursionRoute from './route/excursion.route.js';
 import messageRoute from './route/message.route.js';
 import reviewRoute from './route/review.route.js';
+import logRoute from './route/log.route.js';
 
 const app = express();
 const PORT = application.PORT;
@@ -43,6 +44,7 @@ app.use('/api/contactus', contactUsRoute);
 app.use('/api/message', messageRoute);
 app.use('/api/excursion', excursionRoute);
 app.use('/api/reviews', reviewRoute);
+app.use('/api/logs', logRoute);
 
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
