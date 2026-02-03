@@ -1,5 +1,6 @@
 import aboutUs from "../models/aboutUs.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
+import { logAction } from "../utils/logger.js";
 
 
 export const getData = async (req, res) => {
@@ -68,6 +69,14 @@ export const setData = async (req, res) => {
         }
 
         const savedData = await aboutUs.create(aboutUsData);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_ABOUT_PAGE", {
+                aboutId: savedData._id,
+                title: savedData.hero?.heroTitle || "About Us Page"
+            });
+        }
 
         res.status(201).json({
             success: true,
@@ -149,6 +158,14 @@ export const updateData = async (req, res) => {
             new: true,
         });
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_ABOUT_PAGE", {
+                aboutId: updatedData._id,
+                updatedFields: Object.keys(aboutUsData)
+            });
+        }
+
         res.json({
             success: true,
             message: "About us data updated successfully",
@@ -184,6 +201,14 @@ export const deleteData = async (req, res) => {
         }
 
         await aboutUs.findByIdAndDelete(req.params.id);
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_ABOUT_PAGE", {
+                aboutId: data._id
+            });
+        }
+
         res.json({
             success: true,
             message: "About us data deleted successfully"

@@ -1,5 +1,6 @@
 import ServicePageModel from '../models/service.model.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../services/cloudinary.js';
+import { logAction } from '../utils/logger.js';
 
 // --- PUBLIC / COMBINED DATA ---
 export const getServicePageData = async (req, res) => {
@@ -56,6 +57,13 @@ export const setServiceHero = async (req, res) => {
         doc.serviceheroes = [heroData];
         await doc.save();
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_SERVICE_HERO", {
+                heroTitle: heroData.heroTitle || "Service Hero"
+            });
+        }
+
         res.status(200).json({ hero: doc.serviceheroes[0], message: 'Hero saved successfully' });
     } catch (error) {
         console.error('Error saving hero:', error);
@@ -101,6 +109,15 @@ export const addService = async (req, res) => {
         await doc.save();
 
         const newService = doc.services[doc.services.length - 1];
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_SERVICE", {
+                serviceId: newService._id,
+                serviceName: newService.title || "Service"
+            });
+        }
+
         console.log('Service added successfully:', newService._id);
         res.status(201).json({ service: newService });
     } catch (error) {
@@ -167,6 +184,15 @@ export const updateService = async (req, res) => {
         service.set(serviceData);
         await doc.save();
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_SERVICE", {
+                serviceId: service._id,
+                serviceName: service.title || "Service",
+                updatedFields: Object.keys(serviceData)
+            });
+        }
+
         console.log('Service updated successfully');
         res.status(200).json({ service });
     } catch (error) {
@@ -188,6 +214,14 @@ export const deleteService = async (req, res) => {
         // Use pull to remove the subdocument reliable
         doc.services.pull({ _id: req.params.id });
         await doc.save();
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_SERVICE", {
+                serviceId: service._id,
+                serviceName: service.title || "Service"
+            });
+        }
 
         res.status(200).json({ message: 'Service deleted' });
     } catch (error) {

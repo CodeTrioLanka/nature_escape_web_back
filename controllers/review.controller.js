@@ -1,5 +1,6 @@
 import Review from '../models/review.model.js';
 import googlePlacesService from '../services/googlePlaces.service.js';
+import { logAction } from '../utils/logger.js';
 
 // ==================== PUBLIC ENDPOINTS ====================
 
@@ -202,6 +203,16 @@ export const addAdminReview = async (req, res) => {
 
         await review.save();
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "CREATE_REVIEW", {
+                reviewId: review._id,
+                reviewerName: review.name,
+                rating: review.rating,
+                source: "admin"
+            });
+        }
+
         res.status(201).json({
             success: true,
             message: 'Review added successfully',
@@ -253,6 +264,15 @@ export const updateReview = async (req, res) => {
 
         await review.save();
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "UPDATE_REVIEW", {
+                reviewId: review._id,
+                reviewerName: review.name,
+                updatedFields: Object.keys(req.body)
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Review updated successfully',
@@ -295,6 +315,15 @@ export const deleteReview = async (req, res) => {
 
         await Review.findByIdAndDelete(id);
 
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "DELETE_REVIEW", {
+                reviewId: review._id,
+                reviewerName: review.name,
+                rating: review.rating
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Review deleted successfully'
@@ -328,6 +357,15 @@ export const approveReview = async (req, res) => {
 
         review.isApproved = true;
         await review.save();
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "APPROVE_REVIEW", {
+                reviewId: review._id,
+                reviewerName: review.name,
+                rating: review.rating
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -364,6 +402,15 @@ export const toggleVisibility = async (req, res) => {
 
         review.isVisible = isVisible !== undefined ? isVisible : !review.isVisible;
         await review.save();
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "TOGGLE_REVIEW_VISIBILITY", {
+                reviewId: review._id,
+                reviewerName: review.name,
+                isVisible: review.isVisible
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -417,6 +464,16 @@ export const syncGoogleReviews = async (req, res) => {
                 console.error('Error processing review:', err);
                 errorCount++;
             }
+        }
+
+        // Log the action
+        if (req.user) {
+            await logAction(req.user, "SYNC_GOOGLE_REVIEWS", {
+                total: googleReviews.length,
+                new: newCount,
+                updated: updatedCount,
+                errors: errorCount
+            });
         }
 
         res.status(200).json({

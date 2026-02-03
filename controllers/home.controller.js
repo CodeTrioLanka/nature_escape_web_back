@@ -1,5 +1,6 @@
 import Home from "../models/home.model.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../services/cloudinary.js";
+import { logAction } from "../utils/logger.js";
 
 
 export const homeGet = async (req, res) => {
@@ -71,6 +72,15 @@ export const homeCretae = async (req, res) => {
     }
 
     const home = await Home.create(homeData);
+
+    // Log the action
+    if (req.user) {
+      await logAction(req.user, "CREATE_HOME_PAGE", {
+        homeId: home._id,
+        title: home.title || "Home Page"
+      });
+    }
+
     res.status(201).json({ home, message: "Home created successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -139,6 +149,14 @@ export const homeEdit = async (req, res) => {
       new: true,
     });
 
+    // Log the action
+    if (req.user) {
+      await logAction(req.user, "UPDATE_HOME_PAGE", {
+        homeId: home._id,
+        updatedFields: Object.keys(homeData)
+      });
+    }
+
     res.json({ home, message: "Home updated successfully" });
   } catch (error) {
     console.error('Update error:', error);
@@ -191,6 +209,14 @@ export const homeDelete = async (req, res) => {
     }
 
     await Home.findByIdAndDelete(req.params.id);
+
+    // Log the action
+    if (req.user) {
+      await logAction(req.user, "DELETE_HOME_PAGE", {
+        homeId: home._id
+      });
+    }
+
     res.json({ message: "Home deleted successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
