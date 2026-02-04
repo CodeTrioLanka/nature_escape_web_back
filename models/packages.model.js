@@ -52,7 +52,7 @@ const packagesSchema = new mongoose.Schema(
         itinerary: [
             {
                 day: {
-                    type: Number,
+                    type: String,
                     required: true,
                 },
                 title: {

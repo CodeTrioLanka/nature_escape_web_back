@@ -38,6 +38,7 @@ export const tourGetBySlug = async (req, res) => {
 
 export const tourCreate = async (req, res) => {
     try {
+        console.log('Create payload:', req.body);
         const tourData = { ...req.body };
 
         // Handle images array (expecting 2 images)
@@ -49,6 +50,13 @@ export const tourCreate = async (req, res) => {
                 imageUrls.push(cloudinaryUrl);
             }
             tourData.images = imageUrls;
+        }
+
+        // Handle scheduleImage upload
+        if (req.files && req.files.scheduleImage) {
+            const file = req.files.scheduleImage[0];
+            const cloudinaryUrl = await uploadToCloudinary(file.buffer);
+            tourData.scheduleImage = cloudinaryUrl;
         }
 
         const tour = await Tour.create(tourData);
@@ -98,6 +106,17 @@ export const tourEdit = async (req, res) => {
             }
             tourData.images = imageUrls;
         }
+
+        // Handle scheduleImage upload
+        if (req.files && req.files.scheduleImage) {
+            // Delete old image
+            if (existingTour.scheduleImage) {
+                await deleteFromCloudinary(existingTour.scheduleImage);
+            }
+            const file = req.files.scheduleImage[0];
+            const cloudinaryUrl = await uploadToCloudinary(file.buffer);
+            tourData.scheduleImage = cloudinaryUrl;
+        }
         // Handle direct URL updates (when images are pre-uploaded)
         else if (tourData.images && JSON.stringify(tourData.images) !== JSON.stringify(existingTour.images)) {
             // Delete old images that are not in the new images array
@@ -107,6 +126,13 @@ export const tourEdit = async (req, res) => {
                         await deleteFromCloudinary(oldImageUrl);
                     }
                 }
+            }
+        }
+
+        // Handle scheduleImage URL update
+        if (tourData.scheduleImage !== undefined && tourData.scheduleImage !== existingTour.scheduleImage) {
+            if (existingTour.scheduleImage) {
+                await deleteFromCloudinary(existingTour.scheduleImage);
             }
         }
 
@@ -144,6 +170,10 @@ export const tourDelete = async (req, res) => {
             for (const imageUrl of tour.images) {
                 await deleteFromCloudinary(imageUrl);
             }
+        }
+
+        if (tour.scheduleImage) {
+            await deleteFromCloudinary(tour.scheduleImage);
         }
 
         await Tour.findByIdAndDelete(req.params.id);
