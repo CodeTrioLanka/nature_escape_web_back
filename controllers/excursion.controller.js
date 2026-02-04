@@ -36,6 +36,14 @@ export const addExcursion = async (req, res) => {
                 }
             }
         }
+
+        // Generate slugs for new items
+        excursion.forEach(item => {
+            if (!item.slug && item.title) {
+                item.slug = item.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+            }
+        });
+
         excursionData.excursion = excursion;
 
         const newExcursion = await excursionModel.create(excursionData);
@@ -49,6 +57,25 @@ export const addExcursion = async (req, res) => {
 export const getExcursion = async (req, res) => {
     try {
         const excursions = await excursionModel.find().sort({ createdAt: -1 });
+
+        // Auto-generate slugs if missing
+        let hasUpdates = false;
+
+        for (const doc of excursions) {
+            if (doc.excursion && Array.isArray(doc.excursion)) {
+                for (const item of doc.excursion) {
+                    if (!item.slug && item.title) {
+                        item.slug = item.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                        hasUpdates = true;
+                    }
+                }
+                if (hasUpdates) {
+                    await doc.save();
+                    hasUpdates = false; // Reset for next doc
+                }
+            }
+        }
+
         res.status(200).json(excursions);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -103,6 +130,14 @@ export const updateExcursion = async (req, res) => {
                 }
             }
         }
+
+        // Generate slugs for updated items
+        excursion.forEach(item => {
+            if (!item.slug && item.title) {
+                item.slug = item.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+            }
+        });
+
         excursionData.excursion = excursion;
 
         const updatedExcursion = await excursionModel.findByIdAndUpdate(
@@ -175,6 +210,30 @@ export const getExcursionFilters = async (req, res) => {
             destination: ["All", ...Array.from(destinations)],
             category: ["All", ...Array.from(categories)]
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getExcursionBySlug = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const excursionsDocs = await excursionModel.find({});
+
+        let foundExcursion = null;
+
+        for (const doc of excursionsDocs) {
+            if (doc.excursion && Array.isArray(doc.excursion)) {
+                foundExcursion = doc.excursion.find(item => item.slug === slug);
+                if (foundExcursion) break;
+            }
+        }
+
+        if (foundExcursion) {
+            res.status(200).json(foundExcursion);
+        } else {
+            res.status(404).json({ message: "Excursion not found" });
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
