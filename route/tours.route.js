@@ -13,16 +13,15 @@ const handleBothFormats = (req, res, next) => {
     }
     // Otherwise, use multer for file uploads
     return upload.fields([
-        { name: "images", maxCount: 2 }
+        { name: "images", maxCount: 2 },
+        { name: "scheduleImage", maxCount: 1 }
     ])(req, res, next);
 };
 
 router.get("/", tourGet);
 router.get("/slug/:slug", tourGetBySlug);
 router.get("/:id", tourGetById);
-router.post("/", authenticate, upload.fields([
-    { name: "images", maxCount: 2 }
-]), tourCreate);
+router.post("/", authenticate, handleBothFormats, tourCreate);
 router.put("/:id", authenticate, handleBothFormats, tourEdit);
 router.delete("/:id", authenticate, tourDelete);
 

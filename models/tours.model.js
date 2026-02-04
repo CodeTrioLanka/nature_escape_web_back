@@ -30,6 +30,11 @@ const toursSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        // Schedule Image for tour page
+        scheduleImage: {
+            type: String,
+            default: '',
+        },
         isActive: {
             type: Boolean,
             default: true,
