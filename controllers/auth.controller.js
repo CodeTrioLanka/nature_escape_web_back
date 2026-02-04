@@ -185,3 +185,42 @@ export const changePassword = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const refresh = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'No refresh token provided' });
+    }
+
+    // Verify refresh token
+    const { verifyRefreshToken } = await import('../utils/jwt.js');
+    const payload = verifyRefreshToken(refreshToken);
+
+    // Check if user still exists
+    const user = await User.findById(payload.sub);
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    // Generate new access token
+    const newPayload = { sub: user._id, role: user.role };
+    const newAccessToken = signAccessToken(newPayload);
+
+    // Set new access token cookie
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    res.json({
+      message: 'Token refreshed successfully',
+      user: { id: user._id, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid refresh token' });
+  }
+};

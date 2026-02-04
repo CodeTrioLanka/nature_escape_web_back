@@ -64,4 +64,5 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Export for Vercel
+// Trigger restart: 1
 export default app;
