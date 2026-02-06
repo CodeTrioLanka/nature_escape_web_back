@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import { application } from '../config/application.js';
 
 /**
  * Middleware to verify JWT token from cookies or Authorization header
@@ -18,7 +19,7 @@ export const verifyToken = async (req, res, next) => {
         }
 
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, application.JWT_SECRET);
 
         // Fetch full user details from database for logging
         try {

@@ -18,6 +18,7 @@ import reviewRoute from './route/review.route.js';
 import logRoute from './route/log.route.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = application.PORT;
 
 // Middleware

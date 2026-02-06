@@ -57,7 +57,9 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: user._id, email: user.email, role: user.role }
+      user: { id: user._id, email: user.email, role: user.role },
+      accessToken,
+      refreshToken
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -111,7 +113,9 @@ export const login = async (req, res) => {
 
     res.json({
       message: 'Logged in',
-      user: { id: user._id, email: user.email, role: user.role }
+      user: { id: user._id, email: user.email, role: user.role },
+      accessToken,
+      refreshToken
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -188,7 +192,7 @@ export const changePassword = async (req, res) => {
 
 export const refresh = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ message: 'No refresh token provided' });
@@ -218,7 +222,8 @@ export const refresh = async (req, res) => {
 
     res.json({
       message: 'Token refreshed successfully',
-      user: { id: user._id, email: user.email, role: user.role }
+      user: { id: user._id, email: user.email, role: user.role },
+      accessToken
     });
   } catch (error) {
     res.status(401).json({ message: 'Invalid refresh token' });
