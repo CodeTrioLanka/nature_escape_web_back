@@ -18,6 +18,7 @@ import reviewRoute from './route/review.route.js';
 import logRoute from './route/log.route.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = application.PORT;
 
 // Middleware
@@ -25,6 +26,9 @@ app.use(
   cors({
     origin: application.CLIENT_URL,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie'],
   }),
 );
 
