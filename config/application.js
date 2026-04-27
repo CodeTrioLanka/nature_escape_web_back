@@ -3,9 +3,9 @@ dotenv.config();
 
 export const application = {
   // Server
-  PORT: process.env.PORT || 5000,
+  PORT: process.env.PORT,
   CLIENT_URL: (() => {
-    const url = process.env.CLIENT_URL || "http://localhost:5173";
+    const url = process.env.CLIENT_URL;
     // If multiple URLs are specified (comma-separated), return as array for CORS
     return url.includes(',') ? url.split(',').map(u => u.trim()) : url;
   })(),
