@@ -35,6 +35,14 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Disable caching for API responses
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 //endpoints
 app.use('/api/auth', authRoute);
 app.use("/api/home", homeRoute);

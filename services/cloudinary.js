@@ -7,15 +7,46 @@ cloudinary.config({
   api_secret: application.CLOUDINARY_API_SECRET,
 });
 
+const getUploadOptions = (file) => {
+  let isImage = false;
+
+  if (Buffer.isBuffer(file)) {
+    if (file.length >= 4) {
+      const hex = file.slice(0, 4).toString('hex').toUpperCase();
+      // PNG (89504E47), JPEG (FFD8FF), GIF (47494638), WEBP/RIFF (52494646)
+      isImage = hex.startsWith('89504E47') || 
+                hex.startsWith('FFD8FF') || 
+                hex.startsWith('47494638') || 
+                hex.startsWith('52494646');
+    }
+  } else if (typeof file === 'string') {
+    const ext = file.split('.').pop().toLowerCase();
+    isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'heic', 'tiff', 'bmp'].includes(ext);
+  }
+
+  if (isImage) {
+    return {
+      resource_type: 'image',
+      format: 'webp',
+      transformation: [{ quality: 'auto:good' }]
+    };
+  }
+
+  return {
+    resource_type: 'auto'
+  };
+};
+
 export const uploadToCloudinary = async (file) => {
   try {
     let result;
+    const options = getUploadOptions(file);
 
     // Handle buffer (memory storage)
     if (Buffer.isBuffer(file)) {
       result = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          { resource_type: 'auto' },
+          options,
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -25,9 +56,7 @@ export const uploadToCloudinary = async (file) => {
     }
     // Handle file path (disk storage)
     else {
-      result = await cloudinary.uploader.upload(file, {
-        resource_type: 'auto'
-      });
+      result = await cloudinary.uploader.upload(file, options);
     }
 
     return result.secure_url;
