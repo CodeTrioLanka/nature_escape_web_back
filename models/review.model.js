@@ -70,7 +70,6 @@ const reviewSchema = new mongoose.Schema({
 
 // Index for efficient queries
 reviewSchema.index({ source: 1, isApproved: 1, isVisible: 1 });
-reviewSchema.index({ googleReviewId: 1 });
 reviewSchema.index({ reviewDate: -1 });
 
 // Virtual for display name

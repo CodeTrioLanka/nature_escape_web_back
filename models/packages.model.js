@@ -119,7 +119,6 @@ const packagesSchema = new mongoose.Schema(
 );
 
 // Indexes for performance
-packagesSchema.index({ slug: 1 });
 packagesSchema.index({ tourCategory: 1, isActive: 1 });
 packagesSchema.index({ featured: 1, isActive: 1 });
 

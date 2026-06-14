@@ -48,7 +48,6 @@ const toursSchema = new mongoose.Schema(
 );
 
 // Index for performance
-toursSchema.index({ slug: 1 });
 toursSchema.index({ isActive: 1, displayOrder: 1 });
 
 export default mongoose.model("tour", toursSchema);
